@@ -14,24 +14,49 @@
 
   function displayResult(result) {
     const outputBox = document.getElementById("output");
-    var doc = new DOMParser().parseFromString(result.value, "text/html");
 
-    const ols = doc?.querySelector("ol");
-    const questionsOLS = ols.querySelectorAll(":scope > li");
+    const questionDocument = new DOMParser().parseFromString(
+      result.value,
+      "text/html"
+    );
+
+    console.log(`questionDocument `, questionDocument.body);
+
+    let questionSets = questionDocument
+      .querySelector("body")
+      .querySelectorAll(":scope > ol");
+    if (!questionSets.length)
+      questionSets = questionDocument
+        .querySelector("body")
+        .querySelectorAll(":scope > ul");
+
+    if (!questionSets.length) return;
 
     let questions = [];
-    questionsOLS.forEach((q) => {
-      const question = q.childNodes[0].textContent;
-      let optionsDOM = q
-        .querySelector(":scope > ol")
-        .querySelectorAll(":scope > li");
-      let options = [];
-      optionsDOM.forEach((op) => {
-        options.push(op.textContent);
+
+    questionSets.forEach((questionSet) => {
+      let allQuestions = questionSet.querySelectorAll(":scope > li");
+
+      allQuestions.forEach((q) => {
+        const question = q.childNodes[0].textContent;
+
+        let optionsULorOL = q.querySelector(":scope > ol");
+
+        if (!optionsULorOL) optionsULorOL = q.querySelector(":scope > ul");
+        // No options provided
+        if (!optionsULorOL) return;
+
+        let optionsDOM = optionsULorOL.querySelectorAll(":scope > li");
+        if (!optionsDOM.length) return;
+        let options = [];
+        optionsDOM.forEach((op) => {
+          options.push(op.textContent);
+        });
+
+        questions.push({ question, options });
       });
-      questions.push({ question, options });
     });
-    console.log("questions ",questions)
+    console.log("questions ", questions);
     const quest = questions
       .map((q) => {
         const options = q.options
