@@ -107,7 +107,7 @@
             return singleOption;
           })
           .join("    ");
-        return `<li>${q.question}<ol>${options}</ol></li>`;
+        return `<li>${q.question}<ol type='a' >${options}</ol></li>`;
       })
       .join(" ");
 
